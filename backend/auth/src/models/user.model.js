@@ -7,14 +7,23 @@ const UserSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+
+    fullName: {
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
+    },
     password: {
       type: String,
       required: true,
       minlength: 6,
-      function(value) {
-        if (this.googleId) {
-          return true;
-        }
+      function() {
+        return !this.googleId;
       },
     },
     goodleId: {
