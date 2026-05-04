@@ -61,3 +61,38 @@ export const login = async (req, res) => {
     res.status(200).json({ message: 'Login successful' , token  });
 
 }
+
+
+
+export async function GoogleLogin(req, res) {
+   const  user = req.user;
+
+
+    const IsUserExist = await User.findOne({ $or :[
+        {email  : user.emails[0].value},
+        {googleId  : user.id}
+    ]})
+
+   if(IsUserExist){
+    const token = jwt.sign({ Id: IsUserExist._id , role: IsUserExist.role , email: IsUserExist.email }, config.JWT_SECRET, { expiresIn: '7d' });
+    res.cookie('token', token)
+    return res.status(200).json({ message: 'Login successful' , token  });
+   }
+
+    const newUser = await User.create({
+        googleId: user.id,
+        email: user.emails[0].value,
+        fullName: {
+            firstName: user.name.givenName,
+            lastName: user.name.familyName
+        },
+        googleId: user.id
+    })
+
+    const token = jwt.sign({ Id: newUser._id , role: newUser.role , email: newUser.email }, config.JWT_SECRET, { expiresIn: '7d' });
+    res.cookie('token', token)
+    res.status(201).json({
+        message: 'User registered successfully',
+        user: newUser,
+    })
+}

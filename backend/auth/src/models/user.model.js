@@ -20,13 +20,12 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 6,
-      function() {
+      required: function() {
         return !this.googleId;
       },
     },
-    goodleId: {
+    googleId: {
       type: String,
     },
     role: {
