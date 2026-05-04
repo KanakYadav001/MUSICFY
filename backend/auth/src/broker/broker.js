@@ -25,15 +25,4 @@ export const sendToQueue = async (name ,data) => {
   console.log("📨 Job added:", data);
 };
 
-export const consumeQueue = async (name,callback) => {
-  if (!channel) {
-    await connectQueue();
-  }
 
-    await channel.assertQueue(name, { durable: true });
-
-    channel.consume(name, async (msg) => {
-       await callback(JSON.parse(msg.content.toString()));
-        channel.ack(msg);
-    })
-};

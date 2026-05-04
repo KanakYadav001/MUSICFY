@@ -30,7 +30,7 @@ export const sendEmail = async (to, subject, text, html) => {
       from: `"Your Name" <${config.EMAIL_USER}>`, // sender address
       to, // list of receivers
       subject, // Subject line
-      text, // plain text body
+    text, // plain text body
       html, // html body
     });
 

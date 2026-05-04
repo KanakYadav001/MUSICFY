@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import config from '../config/config.js';
-
+import { sendToQueue } from '../broker/broker.js';
 
 export const register = async (req, res) => {
     const { email, fullName: { firstName, lastName }, password } = req.body;
@@ -27,6 +27,12 @@ export const register = async (req, res) => {
     const token = jwt.sign({ Id: user._id  , role: user.role , email: user.email }, config.JWT_SECRET, { expiresIn: '7d' });
 
     res.cookie('token', token)
+
+    await sendToQueue("User_Register_Queue", {
+        email,
+        fullName: { firstName, lastName },
+        role: user.role
+    })
 
     res.status(201).json({ message: 'User registered successfully',
         user
@@ -89,8 +95,17 @@ export async function GoogleLogin(req, res) {
         googleId: user.id
     })
 
+
     const token = jwt.sign({ Id: newUser._id , role: newUser.role , email: newUser.email }, config.JWT_SECRET, { expiresIn: '7d' });
     res.cookie('token', token)
+
+
+      await sendToQueue("User_Register_Queue", {
+        email: newUser.email,
+        fullName: { firstName: newUser.fullName.firstName, lastName: newUser.fullName.lastName },
+        role: newUser.role
+    })
+
     res.status(201).json({
         message: 'User registered successfully',
         user: newUser,
