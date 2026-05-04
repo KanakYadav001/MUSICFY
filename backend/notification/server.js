@@ -1,6 +1,7 @@
+import config from './src/config/config.js';
 import app from './src/app.js';
 
 
-app.listen(3001, () => {
-    console.log('Notification service is running on port 3001');
+app.listen(config.PORT, () => {
+    console.log(`Notification service is running on port ${config.PORT}`);
 });
